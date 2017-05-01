@@ -64,7 +64,10 @@ var singleChoicesSchema = new mongoose.Schema({
     title: {
         type: String
     },
-    option: [String], // 单选题的选项
+    option: [{ //多选题选项
+        optionValue: String,
+        updated: Date
+    }],
     correctIndex: Number, // 正确答案的下标
     created: {
         type: Date,
@@ -79,7 +82,10 @@ var multipleChoicesSchema = new mongoose.Schema({
     title: {
         type: String
     },
-    option: [String], //多选题选项
+    option: [{ //选项
+        optionValue: String,
+        updated: Date
+    }],
     correctIndex: [Number], // 正确答案的下标
     created: {
         type: Date,
@@ -142,11 +148,11 @@ var questionSetSchema = new mongoose.Schema({
         ref: 'Teacher'
     }],
     setName: String,
-    singleChoice: [singleChoicesSchema],
-    multipleChoice: [multipleChoicesSchema],
-    judgment: [judgmentsSchema],
-    fillBlank: [fillBlanksSchema],
-    subjectiveQuestions: [shortAnswerQuestionsSchema],
+    singleChoice: [singleChoicesSchema], // 单选
+    multipleChoice: [multipleChoicesSchema], // 多选
+    judgment: [judgmentsSchema], // 判断
+    fillBlank: [fillBlanksSchema], // 填空，数据库设计好备用，程序没支持
+    subjectiveQuestions: [shortAnswerQuestionsSchema], // 简答，数据库设计好备用，程序没支持
     created: {
         type: Date,
         "default": Date.now
@@ -160,7 +166,7 @@ var homeworkSchema = new mongoose.Schema({
     name: String,
     // 作业的所有题目都存在这里 mongodb 不介意这么做，是冗余了，本该冗余，
     // 因为题库中的题目会删除，但是作业已经出了，不能删除，作业中的题的类型有：
-    // singleChoices, multipleChoices, judgments, fillBlanks, shortAnswerQuestions，
+    // singleChoice, multipleChoice, judgment, fillBlank, subjectiveQuestions，
     // 另外加上 illustrate，作为大题的解释，比如：一. 选择题，最后一题除外，每小题 3 分，最后一题 5 分
     // 题型（上面 5 种）的结构与题库中的一致，外加 score 字段，代表每道题的分数，也加 type 字段代表题目类型（上面的 5 种）
     // illustrate 的结构如下：
@@ -191,8 +197,8 @@ var homeworkSchema = new mongoose.Schema({
             ref: 'Student'
         }
     }],
-    startTime: Date.now, // 作业开始时间
-    endTime: Date.now, // 作业结束时间
+    startTime: Date, // 作业开始时间
+    endTime: Date, // 作业结束时间
     description: String,
     created: {
         type: Date,
@@ -238,3 +244,8 @@ mongoose.model('Student', studentsSchema);
 mongoose.model('QuestionSet', questionSetSchema);
 mongoose.model('HomeWork', homeworkSchema);
 mongoose.model('Lesson', lessonSchema);
+mongoose.model('singleChoice', singleChoicesSchema);
+mongoose.model('multipleChoice', multipleChoicesSchema);
+mongoose.model('judgment', judgmentsSchema);
+mongoose.model('fillBlank', fillBlanksSchema);
+mongoose.model('subjectiveQuestions', shortAnswerQuestionsSchema);
